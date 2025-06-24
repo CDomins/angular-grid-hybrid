@@ -1,0 +1,22 @@
+<div class="container mx-auto p-4 md:p-8">
+  <header class="bg-white p-4 rounded-lg shadow-md mb-8">
+    <h1 class="text-3xl font-bold text-blue-600">Angular Hybrid App</h1>
+    <p class="text-gray-500 mt-1">Routing with Angular 14</p>
+    <nav class="mt-4 flex space-x-2">
+      <a routerLink="/users" routerLinkActive="active" class="nav-link"
+        >Users</a
+      >
+      <a routerLink="/products" routerLinkActive="active" class="nav-link"
+        >Products</a
+      >
+      <a routerLink="/orders" routerLinkActive="active" class="nav-link"
+        >Orders</a
+      >
+    </nav>
+  </header>
+
+  <main class="bg-white p-6 rounded-lg shadow-md">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+<!-- <router-outlet></router-outlet> -->

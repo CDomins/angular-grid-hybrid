@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="migrationReadyApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AngularJS 1.x App</title>
+
+    <!-- 
+      DEPENDENCIES
+      - AngularJS Core
+      - AngularJS Router (ngRoute)
+      - AngularJS Animate & Touch (Required by UI-Grid)
+      - UI-Grid (CSS and JS)
+      - Tailwind CSS for modern styling
+    -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-touch.min.js"></script>
+    <!-- Changed UI-Grid CDN to cdnjs as an alternative -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.11.0/ui-grid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.11.0/ui-grid.min.css" type="text/css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      /* Basic styling to ensure the grid has a visible height */
+      .grid-container {
+        height: 60vh;
+        width: 100%;
+      }
+      /* Custom styles for nav links */
+      .nav-link {
+        @apply px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md transition-colors duration-200;
+      }
+      .nav-link.active {
+        @apply bg-blue-500 text-white font-semibold shadow-md;
+      }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800" ng-controller="MainController as mainVm">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="bg-white p-4 rounded-lg shadow-md mb-8">
+            <h1 class="text-3xl font-bold text-blue-600">AngularJS for Migration to Angular 14</h1>
+            <p class="text-gray-500 mt-1">Migrate the AngularJS app to Angular 14.</p>
+            <nav class="mt-4 flex space-x-2">
+                <!-- Navigation links that now use ng-class to show the active route -->
+                <a href="#!/users" class="nav-link" ng-class="{'active': mainVm.isActive('/users')}">Users</a>
+                <a href="#!/products" class="nav-link" ng-class="{'active': mainVm.isActive('/products')}">Products</a>
+                <a href="#!/orders" class="nav-link" ng-class="{'active': mainVm.isActive('/orders')}">Orders</a>
+            </nav>
+        </header>
+
+        <!-- 
+            NG-VIEW
+            This is the main container where Angular's router will inject 
+            the template of the current route.
+            In modern Angular, this is equivalent to the `<router-outlet>`.
+        -->
+        <main class="bg-white p-6 rounded-lg shadow-md">
+            <div ng-view></div>
+        </main>
+    </div>
+
+    <!-- 
+        TEMPLATES
+        Using <script type="text/ng-template"> allows us to define our templates 
+        within the main HTML file. This avoids extra HTTP requests and is great for demos.
+        In modern Angular, this content would be in separate component HTML files (e.g., users.component.html).
+    -->
+    <script type="text/ng-template" id="users.html">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">User Management</h2>
+        <p class="mb-4">This view displays a list of users fetched from a dedicated service.</p>
+        <div class="grid-container" ui-grid="vm.gridOptions" ui-grid-auto-resize></div>
+    </script>
+
+    <script type="text/ng-template" id="products.html">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Product Inventory</h2>
+        <p class="mb-4">This view displays a list of products from the `ProductService`.</p>
+        <div class="grid-container" ui-grid="vm.gridOptions" ui-grid-auto-resize></div>
+    </script>
+    
+    <script type="text/ng-template" id="orders.html">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Customer Orders</h2>
+        <p class="mb-4">This view displays order data, combining user and product information, from the `OrderService`.</p>
+        <div class="grid-container" ui-grid="vm.gridOptions" ui-grid-auto-resize></div>
+    </script>
+
+    <!-- Main Application JavaScript -->
+    <script>
+        // ========================================================================
+        // 1. APP MODULE DEFINITION
+        // ========================================================================
+        const app = angular.module('migrationReadyApp', [
+            'ngRoute', 
+            'ngAnimate', 
+            'ngTouch',   
+            'ui.grid', 
+            'ui.grid.autoResize'
+        ]);
+
+        // ========================================================================
+        // 2. ROUTING CONFIGURATION
+        // ========================================================================
+        app.config(function($routeProvider) {
+            $routeProvider
+                .when('/users', {
+                    templateUrl: 'users.html',
+                    controller: 'UsersController',
+                    controllerAs: 'vm' 
+                })
+                .when('/products', {
+                    templateUrl: 'products.html',
+                    controller: 'ProductsController',
+                    controllerAs: 'vm'
+                })
+                .when('/orders', {
+                    templateUrl: 'orders.html',
+                    controller: 'OrdersController',
+                    controllerAs: 'vm'
+                })
+                .otherwise({
+                    redirectTo: '/users' // Default route
+                });
+        });
+        
+        // ========================================================================
+        // 3. MAIN CONTROLLER (for overall layout/nav)
+        // ========================================================================
+        // This controller is attached to the <body> tag and manages global state like navigation.
+        app.controller('MainController', ['$location', function($location) {
+            var vm = this;
+            vm.isActive = function(viewLocation) {
+                // Use $location.path() to get the current route and check if it matches.
+                return $location.path() === viewLocation;
+            };
+        }]);
+
+        // ========================================================================
+        // 4. SERVICES (DATA LAYER)
+        // ========================================================================
+        app.factory('UserService', function($q, $timeout) {
+            const getUsers = function() {
+                var deferred = $q.defer();
+                const users = [
+                    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'Admin' },
+                    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', role: 'User' },
+                    { id: 3, name: 'Peter Jones', email: 'peter.jones@example.com', role: 'Editor' },
+                    { id: 4, name: 'Mary Johnson', email: 'mary.j@example.com', role: 'User' },
+                ];
+                $timeout(() => deferred.resolve(users), 500);
+                return deferred.promise;
+            };
+            return { getUsers: getUsers };
+        });
+
+        app.factory('ProductService', function($q, $timeout) {
+            const getProducts = function() {
+                var deferred = $q.defer();
+                const products = [
+                    { sku: 'HW-001', name: 'Laptop Pro 15"', price: 1299.99, stock: 45 },
+                    { sku: 'HW-002', name: 'Wireless Mouse', price: 25.50, stock: 250 },
+                    { sku: 'SW-001', name: 'OS License', price: 199.00, stock: 1500 },
+                    { sku: 'AC-005', name: 'USB-C Hub', price: 49.99, stock: 120 },
+                ];
+                $timeout(() => deferred.resolve(products), 300);
+                return deferred.promise;
+            };
+            return { getProducts: getProducts };
+        });
+
+        app.factory('OrderService', function($q, $timeout) {
+            const getOrders = function() {
+                var deferred = $q.defer();
+                const orders = [
+                    { orderId: 1001, customer: 'John Doe', total: 1349.98, status: 'Shipped' },
+                    { orderId: 1002, customer: 'Jane Smith', total: 49.99, status: 'Processing' },
+                    { orderId: 1003, customer: 'Peter Jones', total: 199.00, status: 'Delivered' },
+                    { orderId: 1004, customer: 'Mary Johnson', total: 25.50, status: 'Shipped' },
+                ];
+                $timeout(() => deferred.resolve(orders), 700);
+                return deferred.promise;
+            };
+            return { getOrders: getOrders };
+        });
+
+        // ========================================================================
+        // 5. VIEW-SPECIFIC CONTROLLERS (PRESENTATION LOGIC)
+        // ========================================================================
+        app.controller('UsersController', ['UserService', function(UserService) {
+            var vm = this; 
+            vm.gridOptions = {
+                enableSorting: true,
+                columnDefs: [
+                    { name: 'ID', field: 'id', width: '10%' },
+                    { name: 'Name', field: 'name' },
+                    { name: 'Email', field: 'email' },
+                    { name: 'Role', field: 'role' }
+                ],
+                data: []
+            };
+            
+            UserService.getUsers().then(function(data) {
+                vm.gridOptions.data = data;
+            });
+        }]);
+
+        app.controller('ProductsController', ['ProductService', function(ProductService) {
+            var vm = this;
+            vm.gridOptions = {
+                enableSorting: true,
+                columnDefs: [
+                    { name: 'SKU', field: 'sku' },
+                    { name: 'Product Name', field: 'name' },
+                    { name: 'Price', field: 'price', cellFilter: 'currency' },
+                    { name: 'In Stock', field: 'stock' }
+                ],
+                data: []
+            };
+
+            ProductService.getProducts().then(function(data) {
+                vm.gridOptions.data = data;
+            });
+        }]);
+
+        app.controller('OrdersController', ['OrderService', function(OrderService) {
+            var vm = this;
+            vm.gridOptions = {
+                enableSorting: true,
+                columnDefs: [
+                    { name: 'Order ID', field: 'orderId', width: '15%' },
+                    { name: 'Customer', field: 'customer' },
+                    { name: 'Order Total', field: 'total', cellFilter: 'currency' },
+                    { name: 'Status', field: 'status' }
+                ],
+                data: []
+            };
+
+            OrderService.getOrders().then(function(data) {
+                vm.gridOptions.data = data;
+            });
+        }]);
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>HybridGrid</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-touch.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.11.0/ui-grid.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.11.0/ui-grid.min.css"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Basic styling to ensure the grid has a visible height */
+      .grid-container {
+        height: 60vh;
+        width: 100%;
+      }
+      /* Custom styles for nav links */
+      .nav-link {
+        @apply px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md transition-colors duration-200;
+      }
+      .nav-link.active {
+        @apply bg-blue-500 text-white font-semibold shadow-md;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-50 font-sans text-gray-800"
+    ng-controller="MainController as mainVm"
+  >
+    <!-- <div class="container mx-auto p-4 md:p-8">
+      <header class="bg-white p-4 rounded-lg shadow-md mb-8">
+        <h1 class="text-3xl font-bold text-blue-600">
+          AngularJS for Migration to Angular 14
+        </h1>
+        <p class="text-gray-500 mt-1">
+          Migrate the AngularJS app to Angular 14.
+        </p>
+        <nav class="mt-4 flex space-x-2">
+          <a
+            href="#!/users"
+            class="nav-link"
+            ng-class="{'active': mainVm.isActive('/users')}"
+            >Users</a
+          >
+          <a
+            href="#!/products"
+            class="nav-link"
+            ng-class="{'active': mainVm.isActive('/products')}"
+            >Products</a
+          >
+          <a
+            href="#!/orders"
+            class="nav-link"
+            ng-class="{'active': mainVm.isActive('/orders')}"
+            >Orders</a
+          >
+        </nav>
+      </header>
+
+      <main class="bg-white p-6 rounded-lg shadow-md">
+        <ng-view></ng-view>
+      </main>
+    </div> -->
+    <app-root></app-root>
+    <!-- <script type="text/ng-template" id="users.html">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700">User Management</h2>
+      <p class="mb-4">This view displays a list of users fetched from a dedicated service.</p>
+      <div class="grid-container" ui-grid="vm.gridOptions" ui-grid-auto-resize></div>
+    </script>
+
+    <script type="text/ng-template" id="products.html">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700">Product Inventory</h2>
+      <p class="mb-4">This view displays a list of products from the `ProductService`.</p>
+      <div class="grid-container" ui-grid="vm.gridOptions" ui-grid-auto-resize></div>
+    </script>
+
+    <script type="text/ng-template" id="orders.html">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700">Customer Orders</h2>
+      <p class="mb-4">This view displays order data, combining user and product information, from the `OrderService`.</p>
+      <div class="grid-container" ui-grid="vm.gridOptions" ui-grid-auto-resize></div>
+    </script> -->
+
+    <script src="assets/legacy/js/app.js"></script>
+    <!-- <script src="assets/legacy/js/routes.js"></script> -->
+    <script src="assets/legacy/js/controllers/mainController.js"></script>
+    <script src="assets/legacy/js/controllers/ordersController.js"></script>
+    <script src="assets/legacy/js/controllers/usersController.js"></script>
+    <script src="assets/legacy/js/controllers/productsController.js"></script>
+
+    <script src="assets/legacy/js/services/orderService.js"></script>
+    <script src="assets/legacy/js/services/productService.js"></script>
+    <script src="assets/legacy/js/services/userService.js"></script>
+  </body>
+</html>
